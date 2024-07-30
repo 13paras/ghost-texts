@@ -9,9 +9,9 @@ interface UserProps extends Document {
   username: string;
   email: string;
   password: string;
-  verifyCode: string;
-  isVerified: boolean;
-  verifyCodeExpiry: Date;
+  verifyCode?: string;
+  isVerified?: boolean;
+  verifyCodeExpiry?: Date;
   isAcceptingMessages: boolean;
   messages: MessageProps[];
 }
@@ -58,15 +58,15 @@ const userSchema: Schema<UserProps> = new mongoose.Schema(
     },
     verifyCode: {
       type: String,
-      required: [true, "Password is required"],
+      // required: [true, "Password is required"],
     },
     verifyCodeExpiry: {
       type: Date,
-      required: [true, "Verify code expiry is required"],
+      // required: [true, "Verify code expiry is required"],
     },
     isVerified: {
       type: Boolean,
-      required: true,
+      // required: true,
       default: false,
     },
     isAcceptingMessages: {
