@@ -1,5 +1,6 @@
 import connectDb from "@/lib/db";
 import User from "@/models/user.model";
+import { signupSchema } from "@/schemas/signup.schema";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -14,17 +15,20 @@ export async function POST(request: Request) {
     */
 
   try {
-    const { username, email, password } = await request.json();
+    const body = await request.json();
+    const validatedResponse = signupSchema.safeParse(body);
 
-    if (!username || !email || !password) {
+    if (!validatedResponse.success) {
+      // console.log(validatedResponse.error.message);
       return Response.json(
         {
           success: false,
-          message: "All the fields are required",
+          message: validatedResponse.error?.errors[0].message,
         },
-        { status: 500 }
+        { status: 400 }
       );
     }
+    const { username, email, password } = body;
 
     const existedUser = await User.findOne({ email });
 
