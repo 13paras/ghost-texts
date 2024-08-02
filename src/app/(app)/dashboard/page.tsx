@@ -1,21 +1,50 @@
 "use client";
 
+import { MagicCard } from "@/components/magicui/magic-card";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { acceptMessage } from "@/schemas/acceptMessage.schema";
+import { ApiResponseType } from "@/types/ApiResponse";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios, { AxiosError } from "axios";
+import { CrossIcon, RefreshCwIcon, X } from "lucide-react";
+import { User } from "next-auth";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
+import * as z from "zod";
 
 const Dashboard = () => {
+  const [isSwitchLoading, setIsSwitchLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const inputText = "http://localhost:3000";
   const [copiedText, copy] = useCopyToClipboard();
+
+  const { data: session } = useSession();
+
+  const form = useForm<z.infer<typeof acceptMessage>>({
+    resolver: zodResolver(acceptMessage),
+    defaultValues: {
+      acceptMessages: true,
+    },
+  });
+
+  // Method to get profile url
+  const username = session?.user.username;
+  // const profileUrl = `${window.location.protocol}//${window.location.host}/u/${username}`;
+  const profileUrl = "profileUrl🚀🚀🍪🎯";
 
   const handleCopy = (text: string) => {
     if (copied) return;
     copy(text)
       .then(() => {
         console.log("Copied!", { text });
+        toast.success("Profile URL has been copied to clipboard! 🚀");
         setCopied(true);
         setTimeout(() => {
           setCopied(false);
@@ -26,30 +55,91 @@ const Dashboard = () => {
       });
   };
 
+  // Handling form switch
+  const { register, watch, setValue } = form;
+  const acceptMessages = watch("acceptMessages");
+
+  // Handle switch change
+  const handleSwitchChange = async () => {
+    setIsSwitchLoading(true);
+    try {
+      const response = await axios.post<ApiResponseType>(
+        "/api/accept-messages",
+        {
+          acceptMessages: !acceptMessages,
+        },
+      );
+      setValue("acceptMessages", !acceptMessages);
+      toast.success(response.data.message);
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponseType>;
+      toast.error(
+        axiosError.response?.data.message ??
+          "Failed to update message settings",
+      );
+    } finally {
+      setIsSwitchLoading(false);
+    }
+  };
+
   return (
     <main className="container mx-auto space-y-4">
-      <h2 className="text-4xl mt-12 text-zinc-300 font-semibold">
+      <h2 className="mt-12 text-4xl font-semibold text-zinc-300">
         User Dashboard
       </h2>
       <p className="capitalize text-zinc-400">Copy your unique link</p>
       {/* input for copy */}
       <div className="relative">
         <Input
-          value={inputText}
+          value={profileUrl}
           disabled
           placeholder="profile url"
-          className="h-16 bg-zinc-900 border-zinc-700"
+          className="h-16 border-zinc-700 bg-zinc-900"
         />
         <button
+          type="button"
           className={cn(
-            "absolute right-6 top-4 p-0.5 border dark:border-neutral-800 rounded-md backdrop-blur-2xl z-[2]"
+            "absolute right-6 top-4 z-[2] rounded-md border p-0.5 backdrop-blur-2xl dark:border-neutral-800",
           )}
-          onClick={() => handleCopy(inputText)}
+          onClick={() => handleCopy(profileUrl)}
         >
           {copied ? <CheckMark /> : <ClipBoard />}
         </button>
       </div>
-      {copiedText}
+      <Separator />
+      <div className="flex items-center gap-4">
+        <Switch
+          {...register("acceptMessages")}
+          checked={acceptMessages}
+          onCheckedChange={handleSwitchChange}
+          disabled={isSwitchLoading}
+        />
+        <p>Accept Messages</p>
+      </div>
+      <Separator />
+
+      <div>
+        <Button className="bg-zinc-300">
+          <RefreshCwIcon className="" />
+        </Button>
+      </div>
+      {/* Messages */}
+      <section className="grid h-[400px] w-full grid-cols-2 gap-4 lg:h-[250px]">
+        <MagicCard className="flex cursor-pointer items-center justify-center whitespace-normal text-4xl shadow-2xl">
+          <div>
+            <p>Whats the current status </p>
+            <span className="text-sm text-zinc-400">{Date().slice(0, 16)}</span>
+          </div>
+          <div className="mt-14 flex items-center justify-center">
+            <Button
+              variant={"destructive"}
+              className="transition-all duration-150 ease-in-out active:scale-90"
+            >
+              <X />
+            </Button>
+          </div>
+        </MagicCard>
+      </section>
     </main>
   );
 };
@@ -65,7 +155,7 @@ const ClipBoard = () => (
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
-    className={"scale-[0.70] dark:stroke-neutral-400 stroke-neutral-800"}
+    className={"scale-[0.70] stroke-neutral-800 dark:stroke-neutral-400"}
     strokeLinecap="round"
     strokeLinejoin="round"
   >
@@ -80,7 +170,7 @@ const CheckMark = () => (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
-    className={"scale-[0.70] dark:stroke-neutral-400 stroke-neutral-800"}
+    className={"scale-[0.70] stroke-neutral-800 dark:stroke-neutral-400"}
     stroke="currentColor"
     strokeWidth="2"
     strokeLinecap="round"
