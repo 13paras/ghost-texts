@@ -4,18 +4,91 @@ import { MagicCard } from "@/components/magicui/magic-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { userValidation } from "@/schemas/signup.schema";
+import { signupSchema, userValidation } from "@/schemas/signup.schema";
 import Link from "next/link";
-import { SVGProps } from "react";
+import { SVGProps, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
+import { useDebounceCallback } from "usehooks-ts";
+import { ApiResponseType } from "@/types/ApiResponse";
+import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
-  const formSchema = z.object({
-    username: userValidation,
+  const [username, setUsername] = useState<string>("");
+  const [usernameMessage, setUsernameMessage] = useState<string>("");
+  const [isCheckingUsername, setIsCheckingUsername] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [submittingResponse, setSubmittingResponse] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const debounced = useDebounceCallback(setUsername, 500);
+
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+    },
   });
 
-  const form = useForm<z.infer<typeof formSchema>>();
+  useEffect(() => {
+    const checkUniqueUsername = async () => {
+      if (username) {
+        setIsCheckingUsername(true);
+        setUsernameMessage("");
+        try {
+          const response = await axios.post("/api/check-unique-username", {
+            username,
+          });
+          setUsernameMessage(response?.data?.message);
+        } catch (error) {
+          const axiosError = error as AxiosError<ApiResponseType>;
+          console.log("Axios UsernameError: ", axiosError);
+          setUsernameMessage(
+            axiosError.message ?? "Error while checking username"
+          );
+        } finally {
+          setIsCheckingUsername(false);
+        }
+      }
+    };
+    checkUniqueUsername();
+  }, [username]);
+
+  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+    setSubmittingResponse(true);
+    try {
+      const response = await axios.post("/api/sign-up", {
+        ...data,
+      });
+      if (response.status === 201) {
+        toast.success("User created successfully");
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponseType>;
+      console.log("OnSubmit axiosError: ", axiosError);
+      toast.error(axiosError.message ?? "Error while creating user");
+    } finally {
+      setSubmittingResponse(false);
+    }
+  };
+
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-lg py-4">
@@ -29,34 +102,88 @@ const Signup = () => {
           </p>
         </div>
         <CardContent className="space-y-4">
-          <div className="space-y-2 text-zinc-300">
-            <label htmlFor="email">Email</label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </div>
-          <div className="space-y-2 text-zinc-300">
-            <div className="flex items-center justify-between">
-              <label htmlFor="password">Password</label>
-              <Link
-                href="#"
-                className="text-sm text-muted-foreground hover:underline"
-                prefetch={false}
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <Input id="password" type="password" required />
-          </div>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6 text-zinc-400"
+            >
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-zinc-300 font-semibold">
+                      Username
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="username"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          debounced(e.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    {isCheckingUsername && (
+                      <Loader2Icon className="animate-spin " />
+                    )}
+                    <p
+                      className={`text-sm ${
+                        usernameMessage === "Username is available"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {username} {usernameMessage}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-zinc-300 font-semibold">
+                      Email
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="m@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-zinc-300 font-semibold">
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="*******" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <CardFooter>
+                <Button type="submit" className="w-full  ">
+                  Sign up
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
         </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full  ">
-            Sign up
-          </Button>
-        </CardFooter>
+
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
