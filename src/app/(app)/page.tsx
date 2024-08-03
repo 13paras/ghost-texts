@@ -13,14 +13,11 @@ import {
   CarouselItem,
 } from "@/app/_components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Mail } from "lucide-react";
-import { toast } from "sonner";
+import { MessageCircle } from "lucide-react";
 import messages from "../../messages.json";
 
 export default function Home() {
-  const showToast = () => {
-    toast.success("Hello World");
-  };
+
   return (
     <main>
       {/* Meteor BG */}
@@ -47,7 +44,7 @@ export default function Home() {
                     <CardTitle>{message.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col items-start space-y-2 md:flex-row md:space-x-4 md:space-y-0">
-                    <Mail className="flex-shrink-0" />
+                    <MessageCircle className="flex-shrink-0" />
                     <div>
                       <p>{message.content}</p>
                       <p className="text-xs text-muted-foreground">

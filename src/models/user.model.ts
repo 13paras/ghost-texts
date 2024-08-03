@@ -68,7 +68,7 @@ const userSchema: Schema<UserProps> = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       // required: true,
-      default: false,
+      default: true,
     },
     isAcceptingMessages: {
       type: Boolean,

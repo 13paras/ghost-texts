@@ -1,23 +1,20 @@
 import "next-auth";
-import { DefaultSession } from "next-auth";
-
-// Here we have overwritten/customized the user according to our own need. As next-auth provide only few little details by itself so it's necessary to change it according to our needs
 
 declare module "next-auth" {
+  interface Session {
+    user: {
+      _id?: string;
+      isVerified?: boolean;
+      isAcceptingMessages?: boolean;
+      username?: string;
+    } & DefaultSession["user"];
+  }
+
   interface User {
     _id?: string;
     isVerified?: boolean;
     isAcceptingMessages?: boolean;
     username?: string;
-  }
-
-  interface Session {
-    user: {
-      _id?: string;
-      isVerified?: string;
-      isAcceptingMessages?: boolean;
-      username?: string;
-    } & DefaultSession["user"];
   }
 }
 

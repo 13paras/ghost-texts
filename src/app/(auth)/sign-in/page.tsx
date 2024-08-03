@@ -20,11 +20,8 @@ import { SVGProps, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-// import { ring } from 'ldrs'
 import "ldrs/ring";
 import Loader from "@/app/_components/Loader";
-
-// ring.register()
 
 // TODO: Add signup form from aceternity ui
 

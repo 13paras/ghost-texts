@@ -1,8 +1,7 @@
 "use client";
 
-import { MagicCard } from "@/app/_components/magicui/magic-card";
+import MessageCard from "@/app/_components/MessageCard";
 import { Button } from "@/app/_components/ui/button";
-import { Form, FormControl, FormField } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { Separator } from "@/app/_components/ui/separator";
 import { Switch } from "@/app/_components/ui/switch";
@@ -13,19 +12,18 @@ import { acceptMessage } from "@/schemas/acceptMessage.schema";
 import { ApiResponseType } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
-import { CrossIcon, Loader2, RefreshCcw, RefreshCwIcon, X } from "lucide-react";
-import { User } from "next-auth";
+import { Loader2, RefreshCcw } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
-import * as z from "zod";
 
 const Dashboard = () => {
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [copied, setCopied] = useState(false);
+  const [profileUrl, setProfileUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedText, copy] = useCopyToClipboard();
 
@@ -118,7 +116,14 @@ const Dashboard = () => {
 
   // Method to get profile url
   const username = session?.user.username;
-  const profileUrl = `${window.location.protocol}//${window.location.host}/u/${username}`;
+  // Set profile URL after the component mounts and username is available
+  useEffect(() => {
+    if (username) {
+      setProfileUrl(
+        `${window.location.protocol}//${window.location.host}/u/${username}`,
+      );
+    }
+  }, [username]);
 
   const handleCopy = (text: string) => {
     if (copied) return;
@@ -192,27 +197,11 @@ const Dashboard = () => {
       <section className="grid h-[400px] w-full grid-cols-2 gap-4 lg:h-[250px]">
         {messages.length > 0 ? (
           messages.map((message, index) => (
-            <>
-              <MagicCard
-                key={index}
-                className="flex cursor-pointer items-center justify-center whitespace-normal text-4xl shadow-2xl"
-              >
-                <div>
-                  <p>{message.content}</p>
-                  <span className="text-sm text-zinc-400">
-                    {message.createdAt.toLocaleString()}
-                  </span>
-                </div>
-                <div className="mt-14 flex items-center justify-center">
-                  <Button
-                    variant={"destructive"}
-                    className="transition-all duration-150 ease-in-out active:scale-90"
-                  >
-                    <X />
-                  </Button>
-                </div>
-              </MagicCard>
-            </>
+            <MessageCard
+              key={message._id as string}
+              message={message}
+              onMessageDelete={handleDeleteMessage}
+            />
           ))
         ) : (
           <p>No message to display</p>
