@@ -1,9 +1,9 @@
 "use client";
 
-import { MagicCard } from "@/components/magicui/magic-card";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { MagicCard } from "@/app/_components/magicui/magic-card";
+import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
+import { Input } from "@/app/_components/ui/input";
 import { signupSchema, userValidation } from "@/schemas/signup.schema";
 import Link from "next/link";
 import { SVGProps, useEffect, useState } from "react";
@@ -18,7 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/app/_components/ui/form";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { useDebounceCallback } from "usehooks-ts";
@@ -60,7 +60,7 @@ const Signup = () => {
           const axiosError = error as AxiosError<ApiResponseType>;
           console.log("Axios UsernameError: ", axiosError);
           setUsernameMessage(
-            axiosError.message ?? "Error while checking username"
+            axiosError.message ?? "Error while checking username",
           );
         } finally {
           setIsCheckingUsername(false);
@@ -94,10 +94,10 @@ const Signup = () => {
       <Card className="w-full max-w-lg py-4">
         <div className="flex flex-col items-center space-y-4 p-6">
           <GhostIcon className="h-12 w-12 text-blue-500" />
-          <h2 className="text-4xl text-center pb-2 font-bold tracking-tight text-foreground ">
+          <h2 className="pb-2 text-center text-4xl font-bold tracking-tight text-foreground">
             Join Ghost Texts
           </h2>
-          <p className="text-zinc-300 text-center">
+          <p className="text-center text-zinc-300">
             Sign up to start your anonymous adventure
           </p>
         </div>
@@ -112,7 +112,7 @@ const Signup = () => {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-zinc-300 font-semibold">
+                    <FormLabel className="font-semibold text-zinc-300">
                       Username
                     </FormLabel>
                     <FormControl>
@@ -126,7 +126,7 @@ const Signup = () => {
                       />
                     </FormControl>
                     {isCheckingUsername && (
-                      <Loader2Icon className="animate-spin " />
+                      <Loader2Icon className="animate-spin" />
                     )}
                     <p
                       className={`text-sm ${
@@ -146,7 +146,7 @@ const Signup = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-zinc-300 font-semibold">
+                    <FormLabel className="font-semibold text-zinc-300">
                       Email
                     </FormLabel>
                     <FormControl>
@@ -165,7 +165,7 @@ const Signup = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-zinc-300 font-semibold">
+                    <FormLabel className="font-semibold text-zinc-300">
                       Password
                     </FormLabel>
                     <FormControl>
@@ -176,7 +176,7 @@ const Signup = () => {
                 )}
               />
               <CardFooter>
-                <Button type="submit" className="w-full  ">
+                <Button type="submit" className="w-full">
                   Sign up
                 </Button>
               </CardFooter>

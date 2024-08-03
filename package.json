@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -23,6 +24,7 @@
     "embla-carousel-autoplay": "^8.1.7",
     "embla-carousel-react": "^8.1.7",
     "framer-motion": "^11.3.19",
+    "ldrs": "^1.0.2",
     "lucide-react": "^0.417.0",
     "mongoose": "^8.5.1",
     "next": "14.2.5",

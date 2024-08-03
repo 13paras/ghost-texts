@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
 
           const isPasswordCorrect = await bcrypt.compare(
             credentials.password,
-            user.password
+            user.password,
           );
 
           if (!isPasswordCorrect) {
@@ -42,7 +42,6 @@ export const authOptions: NextAuthOptions = {
 
           return user;
         } catch (error: any) {
-          console.log("Next Auth options error: ", error);
           throw new Error(error.message);
         }
       },

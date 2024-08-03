@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
 import {
   Form,
   FormControl,
@@ -9,22 +9,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/app/_components/ui/form";
+import { Input } from "@/app/_components/ui/input";
 import { signinSchema } from "@/schemas/signIn.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SVGProps } from "react";
+import { SVGProps, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+// import { ring } from 'ldrs'
+import "ldrs/ring";
+import Loader from "@/app/_components/Loader";
+
+// ring.register()
 
 // TODO: Add signup form from aceternity ui
 
 const Login = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof signinSchema>>({
     resolver: zodResolver(signinSchema),
@@ -36,33 +42,43 @@ const Login = () => {
 
   // Next-auth provide sign in functionality by itself
   const onSubmit = async (data: z.infer<typeof signinSchema>) => {
-    const result = await signIn("credentials", {
-      redirect: false,
-      identifier: data.identifier,
-      password: data.password,
-    });
+    setLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        identifier: data.identifier,
+        password: data.password,
+      });
 
-    if (result?.error) {
-      if (result.error === "CredentialsSignin") {
-        toast.error("Invalid credentials");
-      } else {
-        toast.error(result.error);
+      if (result?.error) {
+        if (result.error === "CredentialsSignin") {
+          toast.error("Invalid credentials");
+        } else {
+          toast.error(result.error);
+        }
       }
-    }
 
-    if (result?.url) {
-      router.push("/dashboard");
+      if (result?.url) {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) <Loader />;
+
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-lg py-4">
         <div className="flex flex-col items-center space-y-4 p-6">
           <GhostIcon className="h-12 w-12 text-blue-500" />
-          <h2 className="text-4xl text-center pb-2 font-bold tracking-tight text-foreground ">
+          <h2 className="pb-2 text-center text-4xl font-bold tracking-tight text-foreground">
             Welcome Back to Ghost Texts
           </h2>
-          <p className="text-zinc-300 text-center">
+          <p className="text-center text-zinc-300">
             Sign in to continue your secret conversations
           </p>
         </div>
@@ -74,7 +90,7 @@ const Login = () => {
                 name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-semibold text-base">
+                    <FormLabel className="text-base font-semibold">
                       Username/Email
                     </FormLabel>
                     <FormControl>
@@ -94,7 +110,7 @@ const Login = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-semibold text-base">
+                    <FormLabel className="text-base font-semibold">
                       Password
                     </FormLabel>
                     <FormControl>

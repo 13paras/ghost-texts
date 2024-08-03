@@ -6,55 +6,53 @@ import User from "@/models/user.model";
 export async function POST(request: Request) {
   await connectDb();
 
-  // to get currently logged in user
   const session = await getServerSession(authOptions);
-  const user: NextAuthUser = session?.user as NextAuthUser;
+  const user = session?.user;
 
-  // checking whether there is any session or not (user is login or not)
-  if (!session || !session.user) {
+  if (!session || !user) {
     return Response.json(
       {
         success: false,
-        message: "User not authenticated",
+        message: "Unauthorized",
       },
-      { status: 401 }
+      {
+        status: 401,
+      },
     );
   }
 
   const userId = user._id;
+  const { acceptMessages } = await request.json();
 
   try {
-    const { acceptMessages } = await request.json();
-    const updatedUser = await User.findByIdAndUpdate(
-      {
-        userId,
-      },
-      { isAcceptingMessages: acceptMessages },
-      { new: true } // to get the new updated value
-    );
+    const updatedUser = await User.findById(userId, {
+      isAcceptingMessage: acceptMessages,
+    });
 
     if (!updatedUser) {
       return Response.json(
         {
           success: false,
-          message: "Failed to update user status to accept messages",
+          message: "User not found",
         },
         {
-          status: 401,
-        }
+          status: 404,
+        },
       );
     }
 
     return Response.json(
       {
         success: true,
-        message: "Message acceptance status updated successfully",
-        updatedUser,
+        message: "User status updated successfully",
       },
-      { status: 200 }
+      {
+        status: 200,
+      },
     );
   } catch (error) {
-    console.log(error);
+    console.log("Failed to update user status to accept messages");
+
     return Response.json(
       {
         success: false,
@@ -62,7 +60,7 @@ export async function POST(request: Request) {
       },
       {
         status: 500,
-      }
+      },
     );
   }
 }
@@ -79,7 +77,7 @@ export async function GET(request: Request) {
         success: false,
         message: "User not authenticated",
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -94,7 +92,7 @@ export async function GET(request: Request) {
           success: false,
           message: "User not found",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -104,7 +102,7 @@ export async function GET(request: Request) {
         message: "User is accepting messages",
         isAcceptingMessages: user.isAcceptingMessages,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.log(error);
@@ -113,7 +111,7 @@ export async function GET(request: Request) {
         success: false,
         message: "Something went wrong",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,26 +1,30 @@
 "use client";
 
-import Meteors from "@/components/magicui/meteors";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Meteors from "@/app/_components/magicui/meteors";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/_components/ui/card";
 import {
   Carousel,
   CarouselContent,
-  CarouselItem
-} from "@/components/ui/carousel";
+  CarouselItem,
+} from "@/app/_components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
 import messages from "../../messages.json";
 
 export default function Home() {
-  
   const showToast = () => {
     toast.success("Hello World");
   };
   return (
     <main>
       {/* Meteor BG */}
-      <div className="relative flex space-y-5 h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg  bg-background md:shadow-xl">
+      <div className="relative flex h-[500px] w-full flex-col items-center justify-center space-y-5 overflow-hidden rounded-lg bg-background md:shadow-xl">
         <Meteors number={30} />
         <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-6xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
           Dive into the world of Anonymous Conversations
@@ -38,11 +42,11 @@ export default function Home() {
           <CarouselContent>
             {messages.map((message, index) => (
               <CarouselItem key={index} className="p-4">
-                <Card className="bg-zinc-800 border-zinc-600">
+                <Card className="border-zinc-600 bg-zinc-800">
                   <CardHeader>
                     <CardTitle>{message.title}</CardTitle>
                   </CardHeader>
-                  <CardContent className="flex flex-col md:flex-row items-start space-y-2 md:space-y-0 md:space-x-4">
+                  <CardContent className="flex flex-col items-start space-y-2 md:flex-row md:space-x-4 md:space-y-0">
                     <Mail className="flex-shrink-0" />
                     <div>
                       <p>{message.content}</p>

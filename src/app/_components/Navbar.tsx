@@ -11,9 +11,9 @@ const Navbar = () => {
   const router = useRouter();
   const { data: session } = useSession();
   const user: User = session?.user as User;
-  console.log({ user });
+
   return (
-    <nav className="p-4 flex items-center justify-between">
+    <nav className="flex items-center justify-between p-4">
       <h2 className="text-2xl font-extrabold">Ghost Texts</h2>
       {user ? (
         <button

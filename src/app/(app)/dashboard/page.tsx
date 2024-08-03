@@ -1,20 +1,22 @@
 "use client";
 
-import { MagicCard } from "@/components/magicui/magic-card";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
+import { MagicCard } from "@/app/_components/magicui/magic-card";
+import { Button } from "@/app/_components/ui/button";
+import { Form, FormControl, FormField } from "@/app/_components/ui/form";
+import { Input } from "@/app/_components/ui/input";
+import { Separator } from "@/app/_components/ui/separator";
+import { Switch } from "@/app/_components/ui/switch";
+import { cn } from "@/app/_components/utils";
+import { MessageProps } from "@/models/user.model";
+
 import { acceptMessage } from "@/schemas/acceptMessage.schema";
 import { ApiResponseType } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
-import { CrossIcon, RefreshCwIcon, X } from "lucide-react";
+import { CrossIcon, Loader2, RefreshCcw, RefreshCwIcon, X } from "lucide-react";
 import { User } from "next-auth";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
@@ -22,42 +24,74 @@ import * as z from "zod";
 
 const Dashboard = () => {
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
+  const [messages, setMessages] = useState<MessageProps[]>([]);
   const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [copiedText, copy] = useCopyToClipboard();
 
   const { data: session } = useSession();
 
-  const form = useForm<z.infer<typeof acceptMessage>>({
+  const form = useForm({
     resolver: zodResolver(acceptMessage),
-    defaultValues: {
-      acceptMessages: true,
-    },
   });
-
-  // Method to get profile url
-  const username = session?.user.username;
-  // const profileUrl = `${window.location.protocol}//${window.location.host}/u/${username}`;
-  const profileUrl = "profileUrl🚀🚀🍪🎯";
-
-  const handleCopy = (text: string) => {
-    if (copied) return;
-    copy(text)
-      .then(() => {
-        console.log("Copied!", { text });
-        toast.success("Profile URL has been copied to clipboard! 🚀");
-        setCopied(true);
-        setTimeout(() => {
-          setCopied(false);
-        }, 1000);
-      })
-      .catch((error) => {
-        console.error("Failed to copy!", error);
-      });
-  };
 
   // Handling form switch
   const { register, watch, setValue } = form;
   const acceptMessages = watch("acceptMessages");
+
+  // Optimistic UI for deleting messages
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages(messages.filter((message) => message._id !== messageId));
+  };
+
+  // Fetch user message settings
+  const fetchAcceptMessage = useCallback(async () => {
+    setIsSwitchLoading(true);
+    try {
+      const response = await axios.get<ApiResponseType>("/api/accept-messages");
+      setValue("acceptMessages", response.data.isAcceptingMessages);
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponseType>;
+      toast.error("Error", {
+        description:
+          axiosError.response?.data.message ||
+          "Failed to fetch message settings",
+      });
+    } finally {
+      setIsSwitchLoading(false);
+    }
+  }, [setValue, toast]);
+
+  // Fetch user messages
+  const fetchMessages = useCallback(
+    async (refresh: boolean = false) => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get<ApiResponseType>("/api/get-messages");
+        setMessages(response.data.messages || []);
+        if (refresh) {
+          toast.success("Refreshed Messages", {
+            description: "Showing latest messages",
+          });
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiResponseType>;
+        toast.error("Error", {
+          description:
+            axiosError.response?.data.message ?? "Failed to fetch messages",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [toast],
+  );
+
+  // Fetch initial data on component mount
+  useEffect(() => {
+    fetchMessages();
+    fetchAcceptMessage();
+  }, [fetchMessages, fetchAcceptMessage]);
 
   // Handle switch change
   const handleSwitchChange = async () => {
@@ -80,6 +114,26 @@ const Dashboard = () => {
     } finally {
       setIsSwitchLoading(false);
     }
+  };
+
+  // Method to get profile url
+  const username = session?.user.username;
+  const profileUrl = `${window.location.protocol}//${window.location.host}/u/${username}`;
+
+  const handleCopy = (text: string) => {
+    if (copied) return;
+    copy(text)
+      .then(() => {
+        console.log("Copied!", { text });
+        toast.success("Profile URL has been copied to clipboard! 🚀");
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error("Failed to copy!", error);
+      });
   };
 
   return (
@@ -119,26 +173,50 @@ const Dashboard = () => {
       <Separator />
 
       <div>
-        <Button className="bg-zinc-300">
-          <RefreshCwIcon className="" />
+        <Button
+          className="mt-4"
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            fetchMessages(true);
+          }}
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCcw className="h-4 w-4" />
+          )}
         </Button>
       </div>
       {/* Messages */}
       <section className="grid h-[400px] w-full grid-cols-2 gap-4 lg:h-[250px]">
-        <MagicCard className="flex cursor-pointer items-center justify-center whitespace-normal text-4xl shadow-2xl">
-          <div>
-            <p>Whats the current status </p>
-            <span className="text-sm text-zinc-400">{Date().slice(0, 16)}</span>
-          </div>
-          <div className="mt-14 flex items-center justify-center">
-            <Button
-              variant={"destructive"}
-              className="transition-all duration-150 ease-in-out active:scale-90"
-            >
-              <X />
-            </Button>
-          </div>
-        </MagicCard>
+        {messages.length > 0 ? (
+          messages.map((message, index) => (
+            <>
+              <MagicCard
+                key={index}
+                className="flex cursor-pointer items-center justify-center whitespace-normal text-4xl shadow-2xl"
+              >
+                <div>
+                  <p>{message.content}</p>
+                  <span className="text-sm text-zinc-400">
+                    {message.createdAt.toLocaleString()}
+                  </span>
+                </div>
+                <div className="mt-14 flex items-center justify-center">
+                  <Button
+                    variant={"destructive"}
+                    className="transition-all duration-150 ease-in-out active:scale-90"
+                  >
+                    <X />
+                  </Button>
+                </div>
+              </MagicCard>
+            </>
+          ))
+        ) : (
+          <p>No message to display</p>
+        )}
       </section>
     </main>
   );
