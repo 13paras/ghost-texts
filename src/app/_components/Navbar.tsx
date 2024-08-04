@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import { SVGProps } from "react";
 
 const Navbar = () => {
   const router = useRouter();
@@ -12,8 +13,11 @@ const Navbar = () => {
   const user: User = session?.user as User;
 
   return (
-    <nav className="flex items-center justify-between p-4">
-      <h2 className="text-2xl font-extrabold">Ghost Texts</h2>
+    <nav className="flex items-center justify-between border p-4 shadow-lg">
+      <div className="flex items-center gap-2">
+        <GhostIcon className="h-12 w-12 text-blue-500" />
+        <h2 className="text-2xl font-extrabold">Ghost Texts</h2>
+      </div>
       {user ? (
         <>
           {/* <button
@@ -43,3 +47,24 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+function GhostIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 10h.01" />
+      <path d="M15 10h.01" />
+      <path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z" />
+    </svg>
+  );
+}
