@@ -39,33 +39,35 @@ const Login = () => {
 
   // Next-auth provide sign in functionality by itself
   const onSubmit = async (data: z.infer<typeof signinSchema>) => {
-    setLoading(true);
     try {
       const result = await signIn("credentials", {
         redirect: false,
         identifier: data.identifier,
         password: data.password,
       });
-
+  
       if (result?.error) {
         if (result.error === "CredentialsSignin") {
-          toast.error("Invalid credentials");
+          toast.error("Login Failed", {
+            description: "Incorrect username or password",
+          });
         } else {
-          toast.error(result.error);
+          toast.error("Error", {
+            description: result.error,
+          });
         }
       }
-
+  
       if (result?.url) {
         router.push("/dashboard");
       }
     } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+      console.log("Sign in error: ", error)
+      toast.error("An unexpected error occurred")
     }
   };
 
-  if (loading) <Loader />;
+  // if (loading) <Loader />;
 
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
