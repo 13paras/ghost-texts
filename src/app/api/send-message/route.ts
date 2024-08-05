@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         success: true,
-        message: "Message sent successfully",
+        message: "Your ghost message is sent successfully",
       },
       { status: 200 }
     );
