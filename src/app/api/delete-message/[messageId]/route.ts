@@ -2,12 +2,13 @@ import connectDb from "@/lib/db";
 import { getServerSession, User as NextUser } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import User from "@/models/user.model";
+import { NextApiRequest } from "next";
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { messageid: string } },
+  request: NextApiRequest,
+  { params }: { params: { messageId: string } },
 ) {
-  const messageId = params.messageid;
+  const { messageId } = params;
   await connectDb();
   const session = await getServerSession(authOptions);
   const _user: NextUser = session?.user as NextUser;

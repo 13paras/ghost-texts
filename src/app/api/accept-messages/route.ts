@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   }
 
   const userId = user._id;
-  console.log({ userId });
+  
   const { acceptMessages } = await request.json();
 
   try {
