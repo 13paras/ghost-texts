@@ -38,9 +38,11 @@ const Dashboard = () => {
   const acceptMessages = watch("acceptMessages");
 
   // Optimistic UI for deleting messages
-  const handleDeleteMessage = (messageId: string) => {
-    setMessages(messages.filter((message) => message._id !== messageId));
-  };
+  const handleDeleteMessage = useCallback((messageId: string) => {
+    setMessages((prevMessages) =>
+      prevMessages.filter((message) => message._id !== messageId),
+    );
+  }, []);
 
   // Fetch user message settings
   const fetchAcceptMessage = useCallback(async () => {
@@ -58,32 +60,29 @@ const Dashboard = () => {
     } finally {
       setIsSwitchLoading(false);
     }
-  }, [setValue, toast]);
+  }, [setValue]);
 
   // Fetch user messages
-  const fetchMessages = useCallback(
-    async (refresh: boolean = false) => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get<ApiResponseType>("/api/get-messages");
-        setMessages(response.data.messages || []);
-        if (refresh) {
-          toast.success("Refreshed Messages", {
-            description: "Showing latest messages",
-          });
-        }
-      } catch (error) {
-        const axiosError = error as AxiosError<ApiResponseType>;
-        toast.error("Error", {
-          description:
-            axiosError.response?.data.message ?? "Failed to fetch messages",
+  const fetchMessages = useCallback(async (refresh: boolean = false) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get<ApiResponseType>("/api/get-messages");
+      setMessages(response.data.messages || []);
+      if (refresh) {
+        toast.success("Refreshed Messages", {
+          description: "Showing latest messages",
         });
-      } finally {
-        setIsLoading(false);
       }
-    },
-    [toast],
-  );
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponseType>;
+      toast.error("Error", {
+        description:
+          axiosError.response?.data.message ?? "Failed to fetch messages",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Fetch initial data on component mount
   useEffect(() => {
@@ -120,26 +119,29 @@ const Dashboard = () => {
   useEffect(() => {
     if (username) {
       setProfileUrl(
-        `${window.location.protocol}//${window.location.host}/u/${username}`,
+        `${window.location.protocol}//${window.location.host}/profile/${username}`,
       );
     }
   }, [username]);
 
-  const handleCopy = (text: string) => {
-    if (copied) return;
-    copy(text)
-      .then(() => {
-        console.log("Copied!", { text });
-        toast.success("Profile URL has been copied to clipboard! 🚀");
-        setCopied(true);
-        setTimeout(() => {
-          setCopied(false);
-        }, 1000);
-      })
-      .catch((error) => {
-        console.error("Failed to copy!", error);
-      });
-  };
+  const handleCopy = useCallback(
+    (text: string) => {
+      if (copied) return;
+      copy(text)
+        .then(() => {
+          console.log("Copied!", { text });
+          toast.success("Profile URL has been copied to clipboard! 🚀");
+          setCopied(true);
+          setTimeout(() => {
+            setCopied(false);
+          }, 1000);
+        })
+        .catch((error) => {
+          console.error("Failed to copy!", error);
+        });
+    },
+    [copy, copied],
+  );
 
   return (
     <main className="container mx-auto space-y-4">

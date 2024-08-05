@@ -24,13 +24,18 @@ type MessageCardProps = {
 
 const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
   const handleDeleteConfirm = async () => {
-    console.log("Message Id: ",message._id)
+    console.log("Message Id: ", message._id);
     try {
       const response = await axios.delete<ApiResponseType>(
         `/api/delete-message/${message._id}`,
       );
-      toast.success(response.data.message);
-      onMessageDelete(message._id as string);
+      if (response.data.success) {
+        toast.success(response.data.message);
+        onMessageDelete(message._id as string);
+      } else {
+        toast.error(response.data.message);
+        throw new Error(response.data.message);
+      }
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponseType>;
       toast.error("Error", {
@@ -40,7 +45,7 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
     }
   };
   return (
-    <MagicCard className="flex cursor-pointer items-center justify-center whitespace-normal h-[400px] text-2xl shadow-2xl">
+    <MagicCard className="flex h-[400px] cursor-pointer items-center justify-center whitespace-normal text-2xl shadow-2xl">
       <div>
         <p>{message.content}</p>
         <span className="text-sm text-zinc-400">
