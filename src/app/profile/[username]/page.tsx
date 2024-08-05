@@ -76,6 +76,7 @@ const PublicProfile = () => {
         // Clearing the message after the message is sent.
         // form.reset();
         form.reset({ content: "" });
+        setCharCount(0);
       }
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponseType>;

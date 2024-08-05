@@ -93,6 +93,7 @@ const Dashboard = () => {
   // Handle switch change
   const handleSwitchChange = async () => {
     setIsSwitchLoading(true);
+    console.log({ acceptMessages });
     try {
       const response = await axios.post<ApiResponseType>(
         "/api/accept-messages",
@@ -101,9 +102,10 @@ const Dashboard = () => {
         },
       );
       setValue("acceptMessages", !acceptMessages);
-      toast.success(response.data.message);
+      toast.success(`${response.data.message} to ${!acceptMessages}`);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponseType>;
+      console.log(axiosError?.response?.data.message);
       toast.error(
         axiosError.response?.data.message ??
           "Failed to update message settings",

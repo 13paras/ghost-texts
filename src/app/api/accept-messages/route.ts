@@ -22,12 +22,17 @@ export async function POST(request: Request) {
   }
 
   const userId = user._id;
+  console.log({ userId });
   const { acceptMessages } = await request.json();
 
   try {
-    const updatedUser = await User.findById(userId, {
-      isAcceptingMessage: acceptMessages,
-    });
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: { isAcceptingMessages: acceptMessages },
+      },
+      { new: true },
+    );
 
     if (!updatedUser) {
       return Response.json(
