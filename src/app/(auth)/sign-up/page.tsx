@@ -1,30 +1,28 @@
 "use client";
 
-import { MagicCard } from "@/app/_components/magicui/magic-card";
 import { Button } from "@/app/_components/ui/button";
 import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
-import { Input } from "@/app/_components/ui/input";
-import { signupSchema, userValidation } from "@/schemas/signup.schema";
-import Link from "next/link";
-import { SVGProps, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/app/_components/ui/form";
+import { Input } from "@/app/_components/ui/input";
+import { signupSchema } from "@/schemas/signup.schema";
+import { ApiResponseType } from "@/types/ApiResponse";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
+import { Loader2Icon } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { SVGProps, useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebounceCallback } from "usehooks-ts";
-import { ApiResponseType } from "@/types/ApiResponse";
-import { Loader2Icon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { z } from "zod";
 
 const Signup = () => {
   const [username, setUsername] = useState<string>("");
@@ -34,7 +32,7 @@ const Signup = () => {
 
   const router = useRouter();
 
-  const debounced = useDebounceCallback(async (username: string) => {
+  const checkUsername = useCallback(async (username: string) => {
     if (username) {
       setIsCheckingUsername(true);
       setUsernameMessage("");
@@ -49,8 +47,13 @@ const Signup = () => {
       } finally {
         setIsCheckingUsername(false);
       }
+    } else {
+      setUsernameMessage("");
+      setIsCheckingUsername(false);
     }
-  }, 1000);
+  }, []);
+
+  const debouncedCheckUsername = useDebounceCallback(checkUsername, 700);
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -60,30 +63,6 @@ const Signup = () => {
       password: "",
     },
   });
-
-  /*   useEffect(() => {
-    const checkUniqueUsername = async () => {
-      if (username) {
-        setIsCheckingUsername(true);
-        setUsernameMessage("");
-        try {
-          const response = await axios.post("/api/check-unique-username", {
-            username,
-          });
-          setUsernameMessage(response?.data?.message);
-        } catch (error) {
-          const axiosError = error as AxiosError<ApiResponseType>;
-          console.log("Axios UsernameError: ", axiosError);
-          setUsernameMessage(
-            axiosError.message ?? "Error while checking username",
-          );
-        } finally {
-          setIsCheckingUsername(false);
-        }
-      }
-    };
-    checkUniqueUsername();
-  }, [username]); */
 
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
     setSubmittingResponse(true);
@@ -136,7 +115,7 @@ const Signup = () => {
                         placeholder="username"
                         onChange={(e) => {
                           field.onChange(e);
-                          debounced(e.target.value);
+                          debouncedCheckUsername(e.target.value);
                         }}
                       />
                     </FormControl>
