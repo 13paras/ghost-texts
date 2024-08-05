@@ -34,33 +34,17 @@ const PublicProfile = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof messageSchema>) => {
-    /* const isUserAcceptingMsg = await axios.get<ApiResponseType>(
-      "/api/accept-messages",
-    );
-
-    console.log(isUserAcceptingMsg.data);
-
-    if (isUserAcceptingMsg.data.isAcceptingMessages) {
-      toast.success("Accepting Message", {
-        description: "User is accepting messages",
-      });
-    } else {
-      toast.error("Not Accepting", {
-        description: "User not accepting messages",
-      });
-    } */
-
     setSendingMessage(true);
     try {
       const isUserAcceptingMsg = await axios.get<ApiResponseType>(
         "/api/accept-messages",
       );
 
-      if (!isUserAcceptingMsg.data.isAcceptingMessages) {
+      /*       if (!isUserAcceptingMsg.data.isAcceptingMessages) {
         toast.error("Not Accepting", {
           description: "User not accepting messages",
         });
-      }
+      } */
 
       const response = await axios.post<ApiResponseType>("/api/send-message", {
         username: params.username,
@@ -81,10 +65,10 @@ const PublicProfile = () => {
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponseType>;
       console.error(axiosError);
-      toast.error("Errorrrrr", {
+      toast.error("Not Accepting", {
         description:
-          axiosError.response?.data.message ??
-          "Failed to update message settings",
+          axiosError.response?.data.message + " currently!!" ??
+          "User is not accepting message currently!!",
       });
     } finally {
       setSendingMessage(false);

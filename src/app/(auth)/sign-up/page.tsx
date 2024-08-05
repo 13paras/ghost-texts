@@ -30,12 +30,27 @@ const Signup = () => {
   const [username, setUsername] = useState<string>("");
   const [usernameMessage, setUsernameMessage] = useState<string>("");
   const [isCheckingUsername, setIsCheckingUsername] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [submittingResponse, setSubmittingResponse] = useState<boolean>(false);
 
   const router = useRouter();
 
-  const debounced = useDebounceCallback(setUsername, 500);
+  const debounced = useDebounceCallback(async (username: string) => {
+    if (username) {
+      setIsCheckingUsername(true);
+      setUsernameMessage("");
+      try {
+        const response = await axios.post("/api/check-unique-username", {
+          username,
+        });
+        setUsernameMessage(response.data.message);
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiResponseType>;
+        setUsernameMessage(axiosError.response?.data.message as string);
+      } finally {
+        setIsCheckingUsername(false);
+      }
+    }
+  }, 1000);
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -46,7 +61,7 @@ const Signup = () => {
     },
   });
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const checkUniqueUsername = async () => {
       if (username) {
         setIsCheckingUsername(true);
@@ -68,7 +83,7 @@ const Signup = () => {
       }
     };
     checkUniqueUsername();
-  }, [username]);
+  }, [username]); */
 
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
     setSubmittingResponse(true);
@@ -135,7 +150,7 @@ const Signup = () => {
                           : "text-red-500"
                       }`}
                     >
-                      {username} {usernameMessage}
+                      {usernameMessage}
                     </p>
                     <FormMessage />
                   </FormItem>

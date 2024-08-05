@@ -45,7 +45,7 @@ const Login = () => {
         identifier: data.identifier,
         password: data.password,
       });
-  
+
       if (result?.error) {
         if (result.error === "CredentialsSignin") {
           toast.error("Login Failed", {
@@ -57,13 +57,13 @@ const Login = () => {
           });
         }
       }
-  
+
       if (result?.url) {
         router.push("/dashboard");
       }
     } catch (error) {
-      console.log("Sign in error: ", error)
-      toast.error("An unexpected error occurred")
+      console.log("Sign in error: ", error);
+      toast.error("An unexpected error occurred");
     }
   };
 

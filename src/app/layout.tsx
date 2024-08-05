@@ -21,9 +21,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <AuthProvider>
         <body className={inter.className}>
-          <ThemeProvider attribute="class" defaultTheme="dark">
-            {children}
-          </ThemeProvider>
+          {children}
           <Toaster richColors />
         </body>
       </AuthProvider>
