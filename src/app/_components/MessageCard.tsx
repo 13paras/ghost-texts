@@ -44,13 +44,23 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
       });
     }
   };
+  const dateString = message.createdAt;
+  const dateObject = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  };
+
+  const formattedDate = dateObject.toLocaleDateString("en-US", options);
   return (
     <MagicCard className="flex h-[400px] cursor-pointer items-center justify-center whitespace-normal text-2xl shadow-2xl">
       <div>
         <p>{message.content}</p>
-        <span className="text-sm text-zinc-400">
-          {message.createdAt.toLocaleString()}
-        </span>
+        <span className="text-sm text-zinc-400">{formattedDate}</span>
       </div>
       <div className="mt-14 flex items-center justify-center">
         <AlertDialog>

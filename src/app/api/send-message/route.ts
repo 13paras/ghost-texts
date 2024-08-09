@@ -20,7 +20,7 @@ export async function POST(request: Request) {
           success: false,
           message: "User not found",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -30,14 +30,29 @@ export async function POST(request: Request) {
           success: false,
           message: "User is not accepting messages",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const newMessage = {
+    const newMessage: Partial<MessageProps> = {
       content,
       createdAt: new Date(),
+      // expiryType,
     };
+
+    /* if (expiryType === 'timed') {
+      if (!expiryTime || typeof expiryTime !== 'number') {
+        return Response.json(
+          {
+            success: false,
+            message: "Expiry time is required and must be a number for timed messages",
+          },
+          { status: 400 }
+        );
+      }
+      newMessage.expiryTime = expiryTime;
+      newMessage.expiresAt = new Date(Date.now() + expiryTime * 60000); // Convert minutes to milliseconds
+    } */
 
     user.messages.push(newMessage as MessageProps);
     await user.save();
@@ -47,7 +62,7 @@ export async function POST(request: Request) {
         success: true,
         message: "Your ghost message is sent successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.log("Send-Message Error: ", error);
@@ -56,7 +71,7 @@ export async function POST(request: Request) {
         success: false,
         message: "Something went wrong",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

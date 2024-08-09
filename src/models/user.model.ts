@@ -3,6 +3,9 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface MessageProps extends Document {
   content: string;
   createdAt: Date;
+  expiryType?: "permanent" | "timed";
+  expiryTime?: number; // in minutes
+  expiresAt?: Date;
 }
 
 interface UserProps extends Document {
@@ -27,10 +30,27 @@ const messageSchema: Schema<MessageProps> = new mongoose.Schema(
       required: true,
       default: Date.now,
     },
+    expiryType: {
+      type: String,
+      enum: ["permanent", "timed"],
+      required: false,
+    },
+    expiryTime: {
+      type: Number,
+      /* required: function (this: MessageProps) {
+        return this.expiryType === "timed";
+      }, */
+    },
+    expiresAt: {
+      type: Date,
+      /* required: function (this: MessageProps) {
+        return this.expiryType === "timed";
+      }, */
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const userSchema: Schema<UserProps> = new mongoose.Schema(
@@ -78,8 +98,10 @@ const userSchema: Schema<UserProps> = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
+
+// userSchema.index({ "messages.expiredAt": 1 }, { expireAfterSeconds: 0 });
 
 //* In nextjs most of the things run on edgetime means on every request, in other words when we create the backend using express or in react then we host the backend seperately and it creates and runs continously on the server but here in nextjs it runs on every request so for that we have to export the models differently so it shouldnot create the folder in the database again and again.
 //* We check if the folder is created in db or not
