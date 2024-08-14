@@ -17,17 +17,16 @@ import { MessageCircle } from "lucide-react";
 import messages from "../../messages.json";
 
 export default function Home() {
-
   return (
     <main>
       {/* Meteor BG */}
       <div className="relative flex h-[500px] w-full flex-col items-center justify-center space-y-5 overflow-hidden rounded-lg bg-background md:shadow-xl">
         <Meteors number={30} />
         <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-6xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
-          Dive into the world of Anonymous Conversations
+        Dive into the world of Ghostly Whispers
         </span>
         <p className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-lg font-semibold leading-none text-transparent dark:from-white dark:to-slate-800/10">
-          Explore ghost texts - where your identity remains a secret
+        Unleash your inner mischief with Ghost Text - where your secrets stay safe
         </p>
       </div>
       <div className="flex flex-col items-center">
@@ -39,7 +38,7 @@ export default function Home() {
           <CarouselContent>
             {messages.map((message, index) => (
               <CarouselItem key={index} className="p-4">
-                <Card className="border-zinc-600 bg-zinc-800">
+                <Card className="border-gray-50/[.1] bg-gray-50/[.10] transition hover:bg-gray-50/[.15]">
                   <CardHeader>
                     <CardTitle>{message.title}</CardTitle>
                   </CardHeader>

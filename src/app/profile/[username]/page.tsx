@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfettiButton } from "@/app/_components/magicui/confetti";
 import { Button } from "@/app/_components/ui/button";
 import {
   Form,
@@ -74,13 +75,16 @@ const PublicProfile = () => {
       setSendingMessage(false);
     }
   };
+
   return (
     <main className="container mx-auto h-screen space-y-6">
       <div className="space-y-4 py-16 text-center">
-        <h1 className="text-4xl font-bold">
-          Have any Feedback or questions or want to show?
+        <h1 className="text-center text-xl font-bold text-gray-400 md:text-3xl">
+          Got any juicy gossip or burning questions? Spill the beans!
         </h1>
-        <p>Then for whom are you waiting</p>
+        <p className="mt-2 text-center text-lg text-white/60">
+          Don&apos;t be shy, I know you&apos;re curious! 😉
+        </p>
       </div>
 
       <Form {...form}>
@@ -95,6 +99,9 @@ const PublicProfile = () => {
               <FormItem>
                 <FormLabel className="text-lg">
                   Send Anonymous message to @{params.username}{" "}
+                  <span className="block text-sm text-white/70">
+                    Minimun 10 characters
+                  </span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -124,8 +131,8 @@ const PublicProfile = () => {
             )}
           />
           <div className="flex items-center justify-center">
-            <Button
-              disabled={sendingMessage}
+            <ConfettiButton
+              disabled={!form.formState.isValid}
               className="flex items-center gap-3"
               type="submit"
             >
@@ -133,7 +140,7 @@ const PublicProfile = () => {
                 <CircleDashedIcon className="h-5 w-5 animate-spin" />
               )}
               Send Message
-            </Button>
+            </ConfettiButton>
           </div>
         </form>
       </Form>

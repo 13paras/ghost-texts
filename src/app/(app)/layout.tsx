@@ -1,4 +1,6 @@
 import Navbar from "@/app/_components/Navbar";
+import { Suspense } from "react";
+import Loader from "../_components/Loader";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -6,9 +8,11 @@ interface RootLayoutProps {
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      {children}
-    </div>
+    <Suspense fallback={<Loader />}>
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        {children}
+      </div>
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import MessageCard from "@/app/_components/MessageCard";
+import MessagesChart from "@/app/_components/MessagesChart";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import { Separator } from "@/app/_components/ui/separator";
@@ -145,6 +146,22 @@ const Dashboard = () => {
     [copy, copied],
   );
 
+  const [chartData, setChartData] = useState([]);
+
+  /*   useEffect(() => {
+    const getMsgStats = async () => {
+      try {
+        const response = await axios.get("/api/message-stats");
+        console.log(response.data);
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiResponseType>;
+        console.log(axiosError?.response?.data.message);
+        toast.error(axiosError.response?.data.message ?? "Failed get stats");
+      }
+    };
+getMsgStats()
+  }, []) */
+
   return (
     <main className="container mx-auto space-y-4">
       <h2 className="mt-12 text-4xl font-semibold text-zinc-300">
@@ -183,7 +200,7 @@ const Dashboard = () => {
 
       <div>
         <Button
-          className="mt-4"
+          className="mt-4 gap-2"
           variant="outline"
           onClick={(e) => {
             e.preventDefault();
@@ -195,8 +212,14 @@ const Dashboard = () => {
           ) : (
             <RefreshCcw className="h-4 w-4" />
           )}
+          Refresh Messages
         </Button>
       </div>
+      {/* Charts */}
+      <div className="py-24">
+        <MessagesChart />
+      </div>
+
       {/* Messages */}
       <section className="grid h-[400px] w-full grid-cols-2 gap-4 lg:h-[250px]">
         {messages.length > 0 ? (

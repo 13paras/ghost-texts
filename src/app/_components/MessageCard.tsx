@@ -57,7 +57,7 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
 
   const formattedDate = dateObject.toLocaleDateString("en-US", options);
   return (
-    <MagicCard className="flex h-[400px] cursor-pointer items-center justify-center whitespace-normal text-2xl shadow-2xl">
+    <MagicCard className="flex h-[400px]  cursor-pointer items-center justify-center whitespace-normal text-2xl shadow-2xl">
       <div>
         <p>{message.content}</p>
         <span className="text-sm text-zinc-400">{formattedDate}</span>

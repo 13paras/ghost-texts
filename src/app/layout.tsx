@@ -22,6 +22,7 @@ export default function RootLayout({
       <AuthProvider>
         <body className={inter.className}>
           {children}
+          
           <Toaster richColors />
         </body>
       </AuthProvider>
