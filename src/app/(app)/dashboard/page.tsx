@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/app/_components/Loader";
 import MessageCard from "@/app/_components/MessageCard";
 import MessagesChart from "@/app/_components/MessagesChart";
 import { Button } from "@/app/_components/ui/button";
@@ -146,47 +147,35 @@ const Dashboard = () => {
     [copy, copied],
   );
 
-  const [chartData, setChartData] = useState([]);
-
-  /*   useEffect(() => {
-    const getMsgStats = async () => {
-      try {
-        const response = await axios.get("/api/message-stats");
-        console.log(response.data);
-      } catch (error) {
-        const axiosError = error as AxiosError<ApiResponseType>;
-        console.log(axiosError?.response?.data.message);
-        toast.error(axiosError.response?.data.message ?? "Failed get stats");
-      }
-    };
-getMsgStats()
-  }, []) */
+  if (isLoading) return <Loader />;
 
   return (
-    <main className="container mx-auto space-y-4">
-      <h2 className="mt-12 text-4xl font-semibold text-zinc-300">
+<main className="container mx-auto space-y-6 px-4 py-8 md:px-6 lg:px-8">
+      <h2 className="text-3xl font-semibold text-zinc-300 md:text-4xl">
         User Dashboard
       </h2>
-      <p className="capitalize text-zinc-400">Copy your unique link</p>
-      {/* input for copy */}
+      <p className="text-lg capitalize text-zinc-400">Copy your unique link</p>
+      
       <div className="relative">
         <Input
           value={profileUrl}
           disabled
           placeholder="profile url"
-          className="h-16 border-zinc-700 bg-zinc-900"
+          className="h-12 border-zinc-700 bg-zinc-900 pr-12 md:h-16"
         />
         <button
           type="button"
           className={cn(
-            "absolute right-6 top-4 z-[2] rounded-md border p-0.5 backdrop-blur-2xl dark:border-neutral-800",
+            "absolute right-2 top-2 z-[2] rounded-md border p-2 backdrop-blur-2xl dark:border-neutral-800 md:right-4 md:top-4",
           )}
           onClick={() => handleCopy(profileUrl)}
         >
           {copied ? <CheckMark /> : <ClipBoard />}
         </button>
       </div>
+
       <Separator />
+
       <div className="flex items-center gap-4">
         <Switch
           {...register("acceptMessages")}
@@ -194,8 +183,9 @@ getMsgStats()
           onCheckedChange={handleSwitchChange}
           disabled={isSwitchLoading}
         />
-        <p>Accept Messages</p>
+        <p className="text-lg">Accept Messages</p>
       </div>
+
       <Separator />
 
       <div>
@@ -215,15 +205,14 @@ getMsgStats()
           Refresh Messages
         </Button>
       </div>
-      {/* Charts */}
-      <div className="py-24">
+
+      <div className="py-12 md:py-24">
         <MessagesChart />
       </div>
 
-      {/* Messages */}
-      <section className="grid h-[400px] w-full grid-cols-2 gap-4 lg:h-[250px]">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {messages.length > 0 ? (
-          messages.map((message, index) => (
+          messages.map((message) => (
             <MessageCard
               key={message._id as string}
               message={message}
@@ -231,7 +220,7 @@ getMsgStats()
             />
           ))
         ) : (
-          <p>No message to display</p>
+          <p className="col-span-full text-center text-lg text-zinc-400">No messages to display</p>
         )}
       </section>
     </main>
