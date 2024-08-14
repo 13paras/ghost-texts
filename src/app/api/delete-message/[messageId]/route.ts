@@ -2,10 +2,10 @@ import connectDb from "@/lib/db";
 import { getServerSession, User as NextUser } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import User from "@/models/user.model";
-import { NextApiRequest } from "next";
+import { NextRequest } from "next/server";
 
 export async function DELETE(
-  request: NextApiRequest,
+  request: NextRequest,
   { params }: { params: { messageId: string } },
 ) {
   const { messageId } = params;
