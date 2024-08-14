@@ -39,6 +39,7 @@ const Login = () => {
 
   // Next-auth provide sign in functionality by itself
   const onSubmit = async (data: z.infer<typeof signinSchema>) => {
+    setLoading(true);
     try {
       const result = await signIn("credentials", {
         redirect: false,
@@ -64,10 +65,12 @@ const Login = () => {
     } catch (error) {
       console.log("Sign in error: ", error);
       toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // if (loading) <Loader />;
+  if (loading) <Loader />;
 
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
