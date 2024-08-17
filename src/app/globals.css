@@ -67,3 +67,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+.styled-scrollbars::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.styled-scrollbars::-webkit-scrollbar-track {
+  background: #333; /* Darker background color */
+}
+
+.styled-scrollbars::-webkit-scrollbar-thumb {
+  background: #777; /* Lighter thumb color for contrast */
+  border-radius: 10px;
+}
+
+.styled-scrollbars::-webkit-scrollbar-thumb:hover {
+  background: #999; /* Even lighter thumb color on hover */
+}
+
+.styled-scrollbars::-webkit-scrollbar-button {
+  display: none;
+}

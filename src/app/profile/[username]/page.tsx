@@ -117,14 +117,14 @@ const PublicProfile = () => {
                 </FormControl>
                 <div
                   className={`text-right text-sm ${
-                    charCount > 110
+                    charCount > 500
                       ? "text-red-500"
-                      : charCount > 80
+                      : charCount > 450
                         ? "text-orange-400"
                         : "text-green-500"
                   }`}
                 >
-                  {charCount} / 120
+                  {charCount} / 520
                 </div>
                 <FormMessage className="text-red-500" />
               </FormItem>
